@@ -2,9 +2,9 @@
   text-align: center;
 }
 
-.App-header {
+.header {
   background-color: #273334;
-  min-height: 100vh;
+  min-height: 10vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -25,6 +25,17 @@
 }
 
 /* Santiago Montero agregations */
+
+.station-list-element {
+  border-width: thin;
+  border-color: #545a5a;
+  border-style: groove;
+}
+
+.padded {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
 
 /* default
 --------------------------------------------------------------- */
@@ -223,6 +234,7 @@ properly.
 /*  2. Misc -------------------------------------------------------- */
 
 .remove-bottom { margin-bottom: 0 !important; }
+.remove-bottom-padd { padding-bottom: 0 !important; }
 .half-bottom { margin-bottom: 12px !important; }
 .add-bottom { margin-bottom: 24px !important; }
 .no-border { border: none; }
