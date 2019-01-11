@@ -15,7 +15,6 @@
 
 .body-content {
   background-color: white;
-  min-height: 100vh;
   display: flex;
   color: #273334;
 }
@@ -27,7 +26,7 @@
 /* Santiago Montero agregations */
 
 .station-list-element {
-  border-width: thin;
+  border-width: 0px 0px 1px 0px;
   border-color: #545a5a;
   border-style: groove;
 }
@@ -37,6 +36,12 @@
   padding-bottom: 10px;
 }
 
+.flexbox-style {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 140px; /* arbitrary height */
+}
 /* default
 --------------------------------------------------------------- */
 .row {
@@ -238,6 +243,7 @@ properly.
 .half-bottom { margin-bottom: 12px !important; }
 .add-bottom { margin-bottom: 24px !important; }
 .no-border { border: none; }
+.shadow { box-shadow: 1px 1px 1px 1px #efefef; }
 
 .text-center  { text-align: center !important; }
 .text-left    { text-align: left !important; }
@@ -249,7 +255,3 @@ properly.
  margin-right: auto !important;
  text-align: center !important;
 }
-
-
-
-
