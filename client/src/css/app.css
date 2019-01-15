@@ -17,6 +17,7 @@
   background-color: white;
   display: flex;
   color: #273334;
+  height: -webkit-fill-available;
 }
 
 .App-link {
@@ -42,6 +43,20 @@
   align-items: center;
   min-height: 140px; /* arbitrary height */
 }
+
+.selected-tab {
+  border-color: #9ec7dc;
+  box-shadow: inset 2px 2px 1px #e2e2e2;
+}
+
+/* it doesnt pick this one */
+.selected-tab-panel {
+  border: darkgray;
+  border-style: groove;
+  border-width: unset;
+  display: block
+}
+
 /* default
 --------------------------------------------------------------- */
 .row {
@@ -71,6 +86,7 @@
   padding: 0 20px;
   min-height: 1px;
   float: left;
+  flex-direction: column;
 }
 .column.centered, .columns.centered  {
    float: none;
