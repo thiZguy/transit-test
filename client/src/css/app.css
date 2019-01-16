@@ -15,9 +15,9 @@
 
 .body-content {
   background-color: white;
-  display: flex;
   color: #273334;
-  height: -webkit-fill-available;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 .App-link {
@@ -27,14 +27,19 @@
 /* Santiago Montero agregations */
 
 .station-list-element {
-  border-width: 0px 0px 1px 0px;
-  border-color: #545a5a;
-  border-style: groove;
+  margin: 0px !important;
+  box-shadow: 1px 1px 1px 0px #00000030;
+}
+
+.station-list-element:hover {
+  margin: 0.5px !important;
+  box-shadow: 1px 1px 1px 0px #0000007a;
+  background-color: #e2e2e2;
 }
 
 .padded {
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
 }
 
 .flexbox-style {
@@ -55,6 +60,21 @@
   border-style: groove;
   border-width: unset;
   display: block
+}
+
+.shadow { box-shadow: 1px 1px 1px 1px #efefef; }
+
+.search-field {
+  height: 50px !important;
+  padding-bottom: 3px;
+}
+
+.favorite-icon {
+  color: lightgray;
+}
+
+.favorite-icon:hover {
+  color: #676767;
 }
 
 /* default
@@ -259,7 +279,6 @@ properly.
 .half-bottom { margin-bottom: 12px !important; }
 .add-bottom { margin-bottom: 24px !important; }
 .no-border { border: none; }
-.shadow { box-shadow: 1px 1px 1px 1px #efefef; }
 
 .text-center  { text-align: center !important; }
 .text-left    { text-align: left !important; }

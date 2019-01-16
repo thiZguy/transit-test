@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "body-parser": "*",
-    "express": "*"
+    "express": "*",
+    "mongodb": "^3.1.11"
   },
   "devDependencies": {
     "concurrently": "^4.0.1"

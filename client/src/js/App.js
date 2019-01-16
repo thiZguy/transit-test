@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import SearchField from 'react-search-field';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import GoogleMapReact from 'google-map-react';
+import { FaStar, FaBus } from 'react-icons/fa';
+
 
 import '../css/app.css';
 import '../css/tabs.css';
@@ -12,9 +14,9 @@ borderColor: '#545a5a'}}>{text}</div>;
 
 
 const defaultStations = [
-  {text: "Gallo verde", lat: -33.456, long: -70.674211 },
-  {text: "Gral. Rafael Urdaneta", lat: -33.459, long: -70.674211 },
-  {text: "La bandera", lat: -33.453, long: -70.674211 }
+  { text: "Gallo verde", lat: -33.456, long: -70.674211 },
+  { text: "Gral. Rafael Urdaneta", lat: -33.459, long: -70.674211 },
+  { text: "La bandera", lat: -33.453, long: -70.674211 }
 ]
 
 class App extends Component {
@@ -30,67 +32,145 @@ class App extends Component {
     super(props)
     this.state = {
        searchedValue: '',
-       stations: defaultStations
+       stations: defaultStations,
+       favorites: null,
+       activeTab: 0,
+    }
+
+    /**COLOCO ESTO PARA AGILIZAR EL CICLO DE DESARROLLO Y
+     * LOS FAVORITOS SE BORREN AL REFRESCAR LA PAG */
+    if (window.performance) {
+      if (performance.navigation.type === 1) {
+        if (process.env.NODE_ENV !== 'production') {
+          localStorage.removeItem('favorites');
+        }
+      }
     }
   }
 
-  searchFavs = async () => { };
+  /* LYFECYCLE METHODS */
+  componentDidMount = () => {
+    this.getFavorites();
+  }
 
-  newSearchval = (value) => {
-    this.setState({searchedValue: value});
+/**
+ * ---------------------------------------
+*/
+
+  /* OTHER METHODS */
+  getFavorites = () => {
+    const cachedFavs = JSON.parse(localStorage.getItem('favorites'));
+    if(cachedFavs) {
+      this.setState({ favorites: cachedFavs });
+    }
+   };
+
+  addFavorite = (value) => {
+    const toStore = JSON.stringify(this.state.favorites ? [...this.state.favorites, value] : [value])
+    localStorage.setItem('favorites', toStore);
+    this.getFavorites();
+  };
+
+  newSearchval = (searchText) => {
+    this.setState({searchedValue: searchText});
   }
 
   changeTab = (value) => {
-    console.log('obtained: ', value);
-    if(value===0)
-      this.setState({stations: defaultStations});
-    else if(value===1)
-      this.setState({ stations: [] });
+    this.setState({ activeTab: value });
   }
 
-  renderStations = (stations, searchedValue) => 
-   <div>
-      {
-        stations.map((element, i) => {
-          const isFound = element.text.toLowerCase().includes(searchedValue.toLowerCase());
-          return (
-            searchedValue === '' || isFound ?
-              <div key={i} className="row station-list-element">
-                <span>{element.text}</span>
-              </div>
-              :
-              <div key={i}></div>
-          );
-        })
-      }
-   </div>;
+  onClickRoute = (element) => {
+    this.addFavorite(element);
+  }
+
+  renderRoutes = (stations, searchedValue) => {
+    if(stations)
+      return (
+      <div>
+        {
+          stations.map((element, i) => {
+            const isFound = element.text.toLowerCase().includes(searchedValue.toLowerCase());
+            return (
+              searchedValue === '' || isFound ?
+                <div key={i} className="row station-list-element">
+                  <div className="six columns">
+                    <span>{element.text}</span>
+                  </div>
+                  <div className="pull-right two columns">
+                    <FaStar onClick={() => this.onClickRoute(element)} className="favorite-icon"/>
+                  </div>
+                </div>
+                :
+                <div key={i}></div>
+            );
+          })
+        }
+      </div>
+      );
+    else
+        return (<div></div>);
+  }
+
+  renderFavs = (favs, searchedValue) => {
+    if(favs)
+      return (
+      <div>
+        {
+          favs.map((element, i) => {
+            const isFound = element.text.toLowerCase().includes(searchedValue.toLowerCase());
+            return (
+              searchedValue === '' || isFound ?
+                <div key={i} className="row station-list-element" onClick={() => this.onClickRoute(element)}>
+                  <span>{element.text}</span>
+                </div>
+                :
+                <div key={i}></div>
+            );
+          })
+        }
+      </div>
+      );
+    else
+        return (<div></div>);
+  }
+   
+/**
+ * ---------------------------------------
+*/
 
   render() {
     const {
-      state: { stations, searchedValue },
+      state: { favorites, stations, searchedValue },
       newSearchval
     } = this;
     return (
       <div className="App">
         {/* HEADER */}
         <div className="header">
-
-        </div>
-        <div className="row body-content">
-          <div className="four columns flexbox-style">
-            <div className="row">
-              <h3>NOMBRE DE LA RUTA</h3>
+          <div className="row">
+            <div className="eleven columns">
+              <div className="row">
+                <h3>Transit!</h3>
+                <FaBus />
+              </div>
             </div>
-            <div className="row">
-              <div className="padded align-center">
+          </div>
+        </div>
+        <div className="body-content row">
+          <div className="four columns">
+            <div className="padded row">
+              <h3>{searchedValue}</h3>
+            </div>
+            <div className="padded row">
+              <div className="align-center">
                 <SearchField
                     placeholder='Buscar ruta...'
                     onChange={newSearchval}
-                    classNames="shadow"
+                    classNames="search-field shadow"
                 />
               </div>
             </div>
-            <div className="row padded">
+            <div className="padded row">
               <Tabs
                 onSelect={(index) => this.changeTab(index)}
                 selectedTabClassName="selected-tab"
@@ -101,17 +181,17 @@ class App extends Component {
                   <Tab>Favoritos</Tab>
                 </TabList>
                 <TabPanel>
-                  {this.renderStations(stations,searchedValue)}
+                  {this.renderRoutes(stations,searchedValue)}
                 </TabPanel>
                 <TabPanel>
-                  {this.renderStations(stations,searchedValue)}
+                  {this.renderFavs(favorites,searchedValue)}
                 </TabPanel>
               </Tabs>
             </div>
           </div>
-          <div className="eight columns flexbox-style">
-            <div className="row">
-              <div style={{ height: '250px', width: '500px' }}>
+          <div className="columns">
+            <div className="padded row">
+              <div style={{ height: '250px', width: '-webkit-fill-available', minWidth: '400px' }}>
                 <GoogleMapReact
                   bootstrapURLKeys={{ key: 'AIzaSyD91ubThsz5ZvUNqZhkhl2_vHkL7miQ6xo' }}
                   defaultCenter={this.props.center}
