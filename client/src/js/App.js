@@ -3,8 +3,6 @@ import SearchField from 'react-search-field';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import GoogleMapReact from 'google-map-react';
 import { FaStar, FaBus } from 'react-icons/fa';
-
-
 import '../css/app.css';
 import '../css/tabs.css';
 
@@ -35,8 +33,9 @@ class App extends Component {
        stations: defaultStations,
        favorites: null,
        activeTab: 0,
+       isLoadingMap: true,
     }
-
+    this.gApiKey = '';
     /**COLOCO ESTO PARA AGILIZAR EL CICLO DE DESARROLLO Y
      * LOS FAVORITOS SE BORREN AL REFRESCAR LA PAG */
     if (window.performance) {
@@ -49,15 +48,16 @@ class App extends Component {
   }
 
   /* LYFECYCLE METHODS */
-  componentDidMount = () => {
+  componentDidMount = () => {    
     this.getFavorites();
+    this.getKey();
   }
 
 /**
  * ---------------------------------------
 */
 
-  /* OTHER METHODS */
+  /* FRONTEND CODE METHODS */
   getFavorites = () => {
     const cachedFavs = JSON.parse(localStorage.getItem('favorites'));
     if(cachedFavs) {
@@ -138,10 +138,30 @@ class App extends Component {
  * ---------------------------------------
 */
 
+/* Backend fetch METHODS */
+
+getKey =  async () => {
+  fetch('/api/retrieveKey').then(
+    async res => {
+      const response = await res.json();
+      this.gApiKey = response.GoogleMapsAPIKey;
+      this.setState({ isLoadingMap: false });
+    }
+  ).catch(
+    error => {
+      // console.log('the error: ', error);
+    }
+  );
+}
+
+/**
+ * ---------------------------------------
+*/
   render() {
     const {
-      state: { favorites, stations, searchedValue },
-      newSearchval
+      state: { favorites, stations, searchedValue, isLoadingMap },
+      newSearchval,
+      gApiKey
     } = this;
     return (
       <div className="App">
@@ -150,8 +170,7 @@ class App extends Component {
           <div className="row">
             <div className="eleven columns">
               <div className="row">
-                <h3>Transit!</h3>
-                <FaBus />
+                <h3>Transit! <FaBus /></h3>
               </div>
             </div>
           </div>
@@ -191,19 +210,22 @@ class App extends Component {
           </div>
           <div className="columns">
             <div className="padded row">
-              <div style={{ height: '250px', width: '-webkit-fill-available', minWidth: '400px' }}>
-                <GoogleMapReact
-                  bootstrapURLKeys={{ key: 'AIzaSyD91ubThsz5ZvUNqZhkhl2_vHkL7miQ6xo' }}
-                  defaultCenter={this.props.center}
-                  defaultZoom={this.props.zoom}
-                >
-                  <AnyReactComponent
-                    lat={-33.455548}
-                    lng={-70.630209}
-                    text="AAAAAAAAAAA"
-                  />
-                </GoogleMapReact>
-              </div>
+            {
+              !isLoadingMap &&
+                <div style={{ height: '250px', width: '-webkit-fill-available', minWidth: '400px' }}>
+                  <GoogleMapReact
+                    bootstrapURLKeys={{ key: gApiKey }}
+                    defaultCenter={this.props.center}
+                    defaultZoom={this.props.zoom}
+                  >
+                    <AnyReactComponent
+                      lat={-33.455548}
+                      lng={-70.630209}
+                      text="AAAAAAAAAAA"
+                    />
+                  </GoogleMapReact>
+                </div> 
+            }
             </div>
           </div>
         </div>
