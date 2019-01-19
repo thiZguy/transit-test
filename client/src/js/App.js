@@ -6,9 +6,13 @@ import { FaStar, FaBus } from 'react-icons/fa';
 import '../css/app.css';
 import '../css/tabs.css';
 
-// CLAVE: AIzaSyD91ubThsz5ZvUNqZhkhl2_vHkL7miQ6xo
-const AnyReactComponent = ({ text }) => <div style={{ borderWidth: '0px 0px 1px 0px',
-borderColor: '#545a5a'}}>{text}</div>;
+import Polyline from './ui/Polyline';
+import Marker from './ui/Marker';
+
+const AnyReactComponent = ({ text }) => <div
+style={{ borderWidth: '0px 0px 1px 0px', borderColor: '#545a5a', borderRadius: '100%'}}>
+{text}
+</div>;
 
 
 const defaultStations = [
@@ -149,7 +153,7 @@ getKey =  async () => {
     }
   ).catch(
     error => {
-      // console.log('the error: ', error);
+      // console.err(error);
     }
   );
 }
@@ -217,13 +221,19 @@ getKey =  async () => {
                     bootstrapURLKeys={{ key: gApiKey }}
                     defaultCenter={this.props.center}
                     defaultZoom={this.props.zoom}
+                    yesIWantToUseGoogleMapApiInternals
+                    onGoogleApiLoaded={({ map, maps }) => { this.setState({ map: map, maps: maps, mapLoaded: true }) }}
                   >
-                    <AnyReactComponent
+                    <Marker
                       lat={-33.455548}
                       lng={-70.630209}
                       text="AAAAAAAAAAA"
                     />
                   </GoogleMapReact>
+                  { 
+                    this.state.mapLoaded &&
+                    <Polyline map={this.state.map} maps={this.state.maps} origin={defaultStations[0]} destination={defaultStations[1]}/>
+                  }
                 </div> 
             }
             </div>
