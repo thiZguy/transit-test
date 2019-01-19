@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import React, { PureComponent } from 'react';
 
 export default class Polyline extends PureComponent {
@@ -20,14 +21,19 @@ export default class Polyline extends PureComponent {
   }
 
   render() {
-    const Polyline = this.props.maps.Polyline
+    const { maps, map } = this.props;
+    if(!maps){
+      return null;
+    }
+
+    const Polyline = maps.Polyline
 
     const renderedPolyline = this.renderPolyline()
     const paths = { path: this.getPaths() }
 
     this.line = new Polyline(Object.assign({}, renderedPolyline, paths))
 
-    this.line.setMap(this.props.map)
+    this.line.setMap(map)
 
     return null
   }
@@ -44,7 +50,8 @@ export default class Polyline extends PureComponent {
 }
 
 
-
+// TESTING
+// eslint-disable-next-line no-unused-vars
 class Normal extends Polyline {
 
   renderPolyline() {

@@ -9,10 +9,11 @@ import '../css/tabs.css';
 import Polyline from './ui/Polyline';
 import Marker from './ui/Marker';
 
-const AnyReactComponent = ({ text }) => <div
-style={{ borderWidth: '0px 0px 1px 0px', borderColor: '#545a5a', borderRadius: '100%'}}>
-{text}
-</div>;
+/* REPLACED BY MARKER */
+// const AnyReactComponent = ({ text }) => <div
+// style={{ borderWidth: '0px 0px 1px 0px', borderColor: '#545a5a', borderRadius: '100%'}}>
+// {text}
+// </div>;
 
 
 const defaultStations = [

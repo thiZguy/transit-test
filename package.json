@@ -12,7 +12,9 @@
     "body-parser": "*",
     "dotenv": "^6.2.0",
     "express": "*",
-    "mongodb": "^3.1.11"
+    "gtfs": "^1.7.0",
+    "mongodb": "^3.1.11",
+    "mongoose": "^5.4.5"
   },
   "devDependencies": {
     "concurrently": "^4.0.1"

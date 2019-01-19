@@ -14,8 +14,7 @@ function Marker(props) {
         border: '1px solid #000',
         borderRadius: '100%',
         userSelect: 'none',
-        transform: 'translate(-50 %, -50 %)',
-        cursor: '${ props => (props.onClick ? pointer : default) }'
+        transform: 'translate(-50 %, -50 %)'
       }}
       {...props.onClick ? { onClick: props.onClick } : {}}
       alt={props.text}
