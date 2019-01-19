@@ -1,26 +1,24 @@
+/**
+ * @author Santiago Montero
+ * @github https://github.com/thiZguy
+ */
+
 import React, { Component } from 'react';
 import SearchField from 'react-search-field';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import GoogleMapReact from 'google-map-react';
-import { FaStar, FaBus } from 'react-icons/fa';
+import { FaStar, FaBus, FaTrashAlt } from 'react-icons/fa';
 import '../css/app.css';
 import '../css/tabs.css';
 
 import Polyline from './ui/Polyline';
-import Marker from './ui/Marker';
+// import Marker from './ui/Marker';
 
 /* REPLACED BY MARKER */
 // const AnyReactComponent = ({ text }) => <div
 // style={{ borderWidth: '0px 0px 1px 0px', borderColor: '#545a5a', borderRadius: '100%'}}>
 // {text}
 // </div>;
-
-
-const defaultStations = [
-  { text: "Gallo verde", lat: -33.456, long: -70.674211 },
-  { text: "Gral. Rafael Urdaneta", lat: -33.459, long: -70.674211 },
-  { text: "La bandera", lat: -33.453, long: -70.674211 }
-]
 
 class App extends Component {
   static defaultProps = {
@@ -35,10 +33,12 @@ class App extends Component {
     super(props)
     this.state = {
        searchedValue: '',
-       stations: defaultStations,
+       routes: [],
        favorites: null,
        activeTab: 0,
        isLoadingMap: true,
+       selectedRoute: null,
+       shape: []
     }
     this.gApiKey = '';
     /**COLOCO ESTO PARA AGILIZAR EL CICLO DE DESARROLLO Y
@@ -56,6 +56,7 @@ class App extends Component {
   componentDidMount = () => {    
     this.getFavorites();
     this.getKey();
+    this.getRoutes();
   }
 
 /**
@@ -63,18 +64,26 @@ class App extends Component {
 */
 
   /* FRONTEND CODE METHODS */
+
   getFavorites = () => {
     const cachedFavs = JSON.parse(localStorage.getItem('favorites'));
     if(cachedFavs) {
       this.setState({ favorites: cachedFavs });
+    } else {
+      this.setState({ favorites: null });
     }
-   };
+  };
 
   addFavorite = (value) => {
     const toStore = JSON.stringify(this.state.favorites ? [...this.state.favorites, value] : [value])
     localStorage.setItem('favorites', toStore);
     this.getFavorites();
   };
+
+  deleteFavorites = () => {
+    localStorage.removeItem('favorites');
+    this.getFavorites();
+  }
 
   newSearchval = (searchText) => {
     this.setState({searchedValue: searchText});
@@ -84,25 +93,34 @@ class App extends Component {
     this.setState({ activeTab: value });
   }
 
-  onClickRoute = (element) => {
-    this.addFavorite(element);
+  selectRoute = (route) => {
+    if(this.state.selectedRoute===route) {
+      this.setState({ selectedRoute: null, shape: null });
+    } else {
+      this.setState({ selectedRoute: route },
+        () => {
+          this.getRouteShape(route.route_id);
+        }
+      );
+    }
   }
 
-  renderRoutes = (stations, searchedValue) => {
-    if(stations)
+  renderRoutes = (routes, searchedValue) => {
+    const { selectedRoute } = this.state;
+    if(routes)
       return (
-      <div>
+        <div className="scrollable-container">
         {
-          stations.map((element, i) => {
-            const isFound = element.text.toLowerCase().includes(searchedValue.toLowerCase());
+          routes.map((route, i) => {
+            const isFound = route.route_long_name.toLowerCase().includes(searchedValue.toLowerCase());
             return (
               searchedValue === '' || isFound ?
-                <div key={i} className="row station-list-element">
+                <div key={i} onClick={() => this.selectRoute(route)} className={`row ${selectedRoute !== route ? 'station-list-element' : 'station-list-element-selected'}`}>
                   <div className="six columns">
-                    <span>{element.text}</span>
+                    <span>{route.route_long_name}</span>
                   </div>
                   <div className="pull-right two columns">
-                    <FaStar onClick={() => this.onClickRoute(element)} className="favorite-icon"/>
+                    <FaStar onClick={() => this.addFavorite(route)} className="favorite-icon"/>
                   </div>
                 </div>
                 :
@@ -119,24 +137,33 @@ class App extends Component {
   renderFavs = (favs, searchedValue) => {
     if(favs)
       return (
-      <div>
+        <div className="scrollable-container">
         {
           favs.map((element, i) => {
-            const isFound = element.text.toLowerCase().includes(searchedValue.toLowerCase());
+            const isFound = element.route_long_name.toLowerCase().includes(searchedValue.toLowerCase());
             return (
               searchedValue === '' || isFound ?
-                <div key={i} className="row station-list-element" onClick={() => this.onClickRoute(element)}>
-                  <span>{element.text}</span>
+                <div key={i} className="row station-list-element" onClick={() => this.addFavorite(element)}>
+                  <span>{element.route_long_name}</span>
                 </div>
                 :
                 <div key={i}></div>
             );
           })
         }
+        {
+          <div className="row align-center">
+              <FaTrashAlt onClick={() => this.deleteFavorites()} className="favorite-delete-icon" />
+          </div>
+        }
       </div>
       );
     else
-        return (<div></div>);
+        return (
+        <div>
+            <h3>{'No favorites found'}</h3>
+        </div>
+        );
   }
    
 /**
@@ -159,12 +186,48 @@ getKey =  async () => {
   );
 }
 
+getRoutes =  async () => {
+  fetch('/api/getRoutes').then(
+    async res => {
+      const response = await res.json();
+      this.setState({ routes: response.routes });
+    }
+  ).catch(
+    error => {
+      // console.err(error);
+    }
+  );
+}
+
+getRouteShape =  async (routeId) => {
+  fetch('/api/getShapeIdByRouteId', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      routeId,
+    }),
+  }).then(
+    async res => {
+      const response = await res.json();
+      // console.log('Shape got: ', response.shape);
+      this.setState({ shape: response.shape });
+    }
+  ).catch(
+    error => {
+      console.log(error);
+    }
+  );
+}
+
 /**
  * ---------------------------------------
 */
   render() {
     const {
-      state: { favorites, stations, searchedValue, isLoadingMap },
+      state: { selectedRoute, favorites, routes, searchedValue, isLoadingMap, mapLoaded, shape, map, maps },
       newSearchval,
       gApiKey
     } = this;
@@ -205,7 +268,7 @@ getKey =  async () => {
                   <Tab>Favoritos</Tab>
                 </TabList>
                 <TabPanel>
-                  {this.renderRoutes(stations,searchedValue)}
+                  {this.renderRoutes(routes,searchedValue)}
                 </TabPanel>
                 <TabPanel>
                   {this.renderFavs(favorites,searchedValue)}
@@ -213,11 +276,11 @@ getKey =  async () => {
               </Tabs>
             </div>
           </div>
-          <div className="columns">
+          <div className="six columns">
             <div className="padded row">
             {
               !isLoadingMap &&
-                <div style={{ height: '250px', width: '-webkit-fill-available', minWidth: '400px' }}>
+                <div style={{ height: '250px', width: '-webkit-fill-available', minWidth: '250px' }}>
                   <GoogleMapReact
                     bootstrapURLKeys={{ key: gApiKey }}
                     defaultCenter={this.props.center}
@@ -225,15 +288,34 @@ getKey =  async () => {
                     yesIWantToUseGoogleMapApiInternals
                     onGoogleApiLoaded={({ map, maps }) => { this.setState({ map: map, maps: maps, mapLoaded: true }) }}
                   >
-                    <Marker
+                    {/* <Marker
                       lat={-33.455548}
                       lng={-70.630209}
                       text="AAAAAAAAAAA"
-                    />
+                    /> */}
                   </GoogleMapReact>
                   { 
-                    this.state.mapLoaded &&
-                    <Polyline map={this.state.map} maps={this.state.maps} origin={defaultStations[0]} destination={defaultStations[1]}/>
+                    mapLoaded && shape && 
+                    shape.map((element, i) => {
+                      const origin = {
+                        lat: element.shape_pt_lat,
+                        lng: element.shape_pt_lon
+                      };
+                      const dest = {
+                        lat: shape[i + 1] ? shape[i + 1].shape_pt_lat : origin.lat,
+                        lng: shape[i + 1] ? shape[i + 1].shape_pt_lon : origin.lng
+                      };
+                      return (
+                        <Polyline
+                          key={i}
+                          map={map}
+                          maps={maps}
+                          origin={origin}
+                          destination={dest}
+                          color={selectedRoute.route_color}
+                        />
+                      );
+                    })
                   }
                 </div> 
             }
