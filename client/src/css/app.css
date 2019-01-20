@@ -88,6 +88,12 @@
   padding-top: 15%;
 }
 
+.favorite-icon-colored {
+  color: #fdd626;
+  font-size: 25px;
+  padding-top: 15%;
+}
+
 .favorite-icon:hover {
   color: #fdd626;
 }
@@ -109,7 +115,7 @@
 @keyframes fade-in-keyframes {
   from {
     font-size: 30px;
-    background-color: tomato;
+    background-color: #ff6347;
     padding: 5px;
   }
   to {
@@ -127,6 +133,16 @@
 
 }
 
+.map-container {
+  height: 400px;
+  width: -webkit-fill-available;
+  min-width: 250px;
+}
+
+.signature {
+  margin-bottom: 5px;
+  font-size: 12px;
+}
 /* default
 --------------------------------------------------------------- */
 .row {

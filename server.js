@@ -54,6 +54,11 @@ app.get('/api/getRoutes', (req, res) => {
   gtfs.getRoutes({
     agency_key: 'transit',
     agency_id: 'TS',
+    within: {
+      lat: -33.44,
+      lon: -70.669266,
+      radius: 3
+    }
   },{},
   { limit: 20 })
   .then(routes => {

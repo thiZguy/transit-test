@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types'
 
 export default class Polyline extends PureComponent {
 
@@ -41,25 +42,27 @@ export default class Polyline extends PureComponent {
   renderPolyline() {
     return {
       geodesic: true,
-      strokeColor: this.props.color || 'blue',
+      strokeColor: this.props.color,
       strokeOpacity: 1,
-      strokeWeight: 4
+      strokeWeight: 2
     };
   }
 
 }
 
+Polyline.defaultProps = {
+  color: '#ff6347'
+}
 
-// TESTING
-// eslint-disable-next-line no-unused-vars
-class Normal extends Polyline {
-
-  renderPolyline() {
-    return {
-      geodesic: true,
-      strokeColor: this.props.color || '#ffffff',
-      strokeOpacity: 1,
-      strokeWeight: 4
-    }
-  }
+Polyline.propTypes = {
+  origin: PropTypes.shape({
+    long: PropTypes.number,
+    lat: PropTypes.number,
+  }).isRequired,
+  destination: PropTypes.shape({
+    long: PropTypes.number,
+    lat: PropTypes.number,
+  }).isRequired,
+  map: PropTypes.shape({}).isRequired,
+  maps: PropTypes.shape({}).isRequired,
 }
