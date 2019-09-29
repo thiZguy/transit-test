@@ -19,8 +19,7 @@ to set up the GoogleMapsApiKey we need to run these commands on the prokect dir 
 ## License
 
 MIT License
-
-Copyright (c) 2019 Santiago Montero
+2019 Santiago Montero
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
